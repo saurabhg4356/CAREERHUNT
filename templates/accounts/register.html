@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Your Candidate Account — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 580px; padding: 3.5rem 1.5rem;">
+  <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2.5rem; box-shadow: var(--shadow-lg);">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <span class="brand-badge" style="margin-bottom: 0.75rem; display: inline-block;">Candidate Onboarding</span>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;">Join CareerHunt</h1>
+      <p style="color: var(--text-secondary); font-size: 0.95rem;">
+        Discover verified opportunities, track your applications, and receive match insights.
+      </p>
+    </div>
+
+    {% if form.errors %}
+      <div class="alert alert-danger" style="margin-bottom: 1.5rem; font-size: 0.875rem;">
+        <div><strong>Please review the following errors:</strong></div>
+        <ul style="margin-top: 0.5rem; padding-left: 1.25rem;">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'accounts:register' %}" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% csrf_token %}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">First Name</label>
+          {{ form.first_name }}
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">Last Name</label>
+          {{ form.last_name }}
+        </div>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">Username</label>
+        {{ form.username }}
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">Email Address</label>
+        {{ form.email }}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">Password</label>
+          {{ form.password }}
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">Confirm Password</label>
+          {{ form.confirm_password }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" style="margin-top: 0.75rem; width: 100%;">
+        Create My Account
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); font-size: 0.9rem; color: var(--text-secondary);">
+      Already have an account? <a href="{% url 'accounts:login' %}" style="font-weight: 600;">Sign in here</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
