@@ -3,6 +3,7 @@ Job and Opportunity exploration, search, and faceted filtering views for CareerH
 """
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
@@ -20,7 +21,7 @@ class JobListView(ListView):
     paginate_by = 9
 
     def get_queryset(self):
-        queryset = Job.objects.select_related("company", "source", "category").prefetch_related("job_skills__skill").active()
+        queryset = Job.objects.select_related("company", "source", "category").prefetch_related("skills").active()
 
         # 1. Search Query (q)
         q = self.request.GET.get("q", "").strip()
@@ -132,7 +133,7 @@ class UpcomingListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        return Job.objects.select_related("company", "source", "category").prefetch_related("job_skills__skill").upcoming().order_by("application_open_date")
+        return Job.objects.select_related("company", "source", "category").prefetch_related("skills").upcoming().order_by("application_open_date")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -152,7 +153,7 @@ class JobDetailView(DetailView):
     slug_url_kwarg = "slug"
 
     def get_queryset(self):
-        return Job.objects.select_related("company", "source", "category").prefetch_related("job_skills__skill")
+        return Job.objects.select_related("company", "source", "category").prefetch_related("skills")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -200,7 +201,7 @@ class ToggleSaveJobView(ListView):
         return redirect(referer or "jobs:job_list")
 
 
-class SavedJobListView(ListView):
+class SavedJobListView(LoginRequiredMixin, ListView):
     """
     Lists opportunities bookmarked by the candidate.
     """
@@ -210,9 +211,6 @@ class SavedJobListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return Job.objects.none()
-        from .models import SavedJob
         return Job.objects.filter(
             saved_by_users__user=self.request.user
-        ).select_related("company", "source").prefetch_related("job_skills__skill").order_by("-saved_by_users__created_at")
+        ).select_related("company", "source").prefetch_related("skills").order_by("-saved_by_users__created_at")

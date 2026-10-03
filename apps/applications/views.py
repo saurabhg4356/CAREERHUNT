@@ -16,7 +16,7 @@ def application_dashboard(request):
     Candidate application tracker board displaying applied, interviewing,
     and offer statuses with dates and personal notes.
     """
-    user_apps = Application.objects.filter(user=request.user).select_related("job__company", "job__source")
+    user_apps = Application.objects.filter(user=request.user).select_related("job", "job__company", "job__source")
     
     # Categorize by status for dashboard cards
     status_counts = {
