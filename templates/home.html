@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}CareerHunt — Discover Verified Job &amp; Internship Opportunities{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-tagline">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      <span>Identifiable &amp; Verified Sources Only</span>
+    </div>
+
+    <h1 class="hero-title">
+      Find Your Next <span>Job or Internship</span> with Proven Authenticity.
+    </h1>
+    <p class="hero-subtitle">
+      No disguised listings. No third-party redirect traps. Every opportunity shows its exact source, verification timestamp, and official application destination.
+    </p>
+
+    <!-- Search Box Component -->
+    <form action="#" method="GET" class="search-container" id="hero-search-form">
+      <div class="search-input-group">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" name="q" class="search-input" placeholder="Role, skill (e.g. Python, AWS), or company..." aria-label="Search query">
+      </div>
+
+      <div class="search-input-group" style="max-width: 220px;">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <input type="text" name="location" class="search-input" placeholder="Location or Remote" aria-label="Location">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" style="flex: 0 0 auto;">
+        <span>Discover Jobs</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </form>
+
+    <!-- Popular Skills Pills -->
+    <div style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+      <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Trending:</span>
+      {% for skill in popular_skills %}
+        <a href="#search-{{ skill|slugify }}" class="badge badge-neutral" style="transition: all var(--transition-fast);">
+          {{ skill }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Value Pillars Section -->
+<section class="container" style="padding: 4rem 1.5rem 2rem;">
+  <div style="text-align: center; max-width: 700px; margin: 0 auto 3rem;">
+    <span class="badge badge-primary" style="margin-bottom: 0.75rem;">Why CareerHunt</span>
+    <h2 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.025em; color: var(--secondary);">Built for Honest Career Discovery</h2>
+    <p style="color: var(--text-secondary); font-size: 1.05rem;">We eliminate fraudulent listings, broken dead-ends, and unverified syndication boards.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
+      <h3 class="feature-title">Source Provenance</h3>
+      <p class="feature-desc">Every opening specifies whether it was ingested from an official career site, authorized API, or direct verified feed.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper" style="background: var(--accent-light); color: var(--accent);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <h3 class="feature-title">Freshness &amp; Deadlines</h3>
+      <p class="feature-desc">Automatic countdowns for upcoming openings and closing-soon alerts prevent you from applying to expired roles.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper" style="background: var(--warning-light); color: #b45309;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
+      <h3 class="feature-title">Transparent Match Score</h3>
+      <p class="feature-desc">Clear rule-based score calculation explaining exactly which required skills you match and where your skill gaps lie.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper" style="background: #fdf2f8; color: #db2777;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+      </div>
+      <h3 class="feature-title">Direct Destination Links</h3>
+      <p class="feature-desc">Never get trapped in middlemen referral hoops. Apply directly on the original employer portal or official hiring board.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Locations Section -->
+<section class="container" style="padding: 2rem 1.5rem 4rem;">
+  <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2.5rem; display: flex; flex-direction: column; align-items: center; text-align: center;">
+    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem;">Search by Top Tech Hubs</h3>
+    <p style="color: var(--text-secondary); max-width: 550px; margin-bottom: 1.5rem;">Explore curated opportunities across premier startup hubs, metropolitan centers, and remote-first organizations.</p>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
+      {% for loc in popular_locations %}
+        <a href="#loc-{{ loc|slugify }}" class="btn btn-outline btn-sm" style="border-radius: var(--radius-full);">
+          📍 {{ loc }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

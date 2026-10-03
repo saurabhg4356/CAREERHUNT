@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Access Denied (403) — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="text-align: center; padding: 6rem 1.5rem;">
+  <span class="badge badge-warning" style="margin-bottom: 1rem; font-size: 0.85rem;">Access Denied</span>
+  <h1 style="font-size: 2.75rem; font-weight: 800; color: var(--secondary); margin-bottom: 1rem;">Permission Required</h1>
+  <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem; font-size: 1.05rem;">
+    You do not possess the required authorization credentials to view or modify this resource.
+  </p>
+  <div style="display: flex; gap: 1rem; justify-content: center;">
+    <a href="{% url 'core:home' %}" class="btn btn-primary">Return to Homepage</a>
+    <a href="{% url 'admin:login' %}" class="btn btn-outline">Sign In</a>
+  </div>
+</div>
+{% endblock %}

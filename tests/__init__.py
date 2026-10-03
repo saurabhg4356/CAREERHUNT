@@ -1,0 +1,1 @@
+# CareerHunt test suite package

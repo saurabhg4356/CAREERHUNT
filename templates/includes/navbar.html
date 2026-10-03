@@ -1,0 +1,29 @@
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="{% url 'core:home' %}" class="brand-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+      </svg>
+      <span>{{ PLATFORM_NAME }}</span>
+      <span class="brand-badge">Verified</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="{% url 'core:home' %}" class="nav-link active">Explore</a></li>
+      <li><a href="#internships" class="nav-link">Internships</a></li>
+      <li><a href="#upcoming" class="nav-link">Upcoming</a></li>
+      <li><a href="#companies" class="nav-link">Companies</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      {% if user.is_authenticated %}
+        <span class="badge badge-primary">Hi, {{ user.first_name|default:user.username }}</span>
+        <a href="{% url 'admin:index' %}" class="btn btn-outline btn-sm">Admin</a>
+      {% else %}
+        <a href="{% url 'admin:login' %}" class="btn btn-outline btn-sm">Sign In</a>
+        <a href="#get-started" class="btn btn-primary btn-sm">Get Started</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>

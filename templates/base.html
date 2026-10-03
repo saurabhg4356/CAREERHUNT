@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <title>{% block title %}{{ PLATFORM_NAME }} — Verified Job &amp; Internship Opportunities{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ PLATFORM_TAGLINE }}{% endblock %}">
+  <meta name="author" content="CareerHunt">
+  
+  <!-- Favicon placeholder svg -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%232563eb%22/><polygon points=%2265,35 55,65 35,65 45,35%22 fill=%22white%22/></svg>">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  {% include 'includes/navbar.html' %}
+  {% include 'includes/messages.html' %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'includes/footer.html' %}
+
+  <!-- JavaScript -->
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

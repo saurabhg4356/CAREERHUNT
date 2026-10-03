@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Server Error (500) — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="text-align: center; padding: 6rem 1.5rem;">
+  <span class="badge badge-danger" style="margin-bottom: 1rem; font-size: 0.85rem;">Error 500</span>
+  <h1 style="font-size: 2.75rem; font-weight: 800; color: var(--secondary); margin-bottom: 1rem;">Internal System Error</h1>
+  <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem; font-size: 1.05rem;">
+    Our engineers have been automatically notified. No sensitive error details are displayed for security reasons.
+  </p>
+  <div style="display: flex; gap: 1rem; justify-content: center;">
+    <a href="{% url 'core:home' %}" class="btn btn-primary">Return to Homepage</a>
+    <a href="{% url 'core:health_check' %}" class="btn btn-outline">Check System Health</a>
+  </div>
+</div>
+{% endblock %}

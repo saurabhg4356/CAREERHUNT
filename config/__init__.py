@@ -1,0 +1,1 @@
+# CareerHunt configuration package
