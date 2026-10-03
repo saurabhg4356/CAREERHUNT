@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Source Provenance &amp; Verification Directory — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 1.5rem;">
+  
+  <div style="text-align: center; max-width: 720px; margin: 0 auto 3rem;">
+    <span class="badge badge-success" style="margin-bottom: 0.75rem; font-size: 0.85rem;">Source Transparency Directory</span>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;">
+      Identifiable &amp; Verified Sources
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 1.05rem;">
+      We document every portal, RSS feed, and authorized API pipeline. CareerHunt never syndicates unverified or anonymous scrapers.
+    </p>
+  </div>
+
+  <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+      <thead>
+        <tr style="background: var(--bg-main); border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          <th style="padding: 1rem 1.5rem;">Source Name</th>
+          <th style="padding: 1rem 1.5rem;">Classification</th>
+          <th style="padding: 1rem 1.5rem;">Status</th>
+          <th style="padding: 1rem 1.5rem;">Verification</th>
+          <th style="padding: 1rem 1.5rem;">Total Opportunities</th>
+          <th style="padding: 1rem 1.5rem;">Last Checked</th>
+          <th style="padding: 1rem 1.5rem; text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for src in sources %}
+          <tr style="border-bottom: 1px solid var(--border-subtle); transition: background var(--transition-fast);">
+            <td style="padding: 1.25rem 1.5rem;">
+              <a href="{% url 'sources:source_detail' src.pk %}" style="font-weight: 700; color: var(--secondary); display: block; font-size: 0.95rem;">
+                {{ src.name }}
+              </a>
+              <span style="font-size: 0.775rem; color: var(--text-muted);">{{ src.source_url|truncatechars:38 }}</span>
+            </td>
+            <td style="padding: 1.25rem 1.5rem;">
+              <span class="badge badge-neutral">{{ src.get_source_type_display }}</span>
+            </td>
+            <td style="padding: 1.25rem 1.5rem;">
+              {% if src.status == 'active' %}
+                <span class="badge badge-success">Active</span>
+              {% elif src.status == 'degraded' %}
+                <span class="badge badge-warning">Degraded</span>
+              {% else %}
+                <span class="badge badge-danger">{{ src.status|capfirst }}</span>
+              {% endif %}
+            </td>
+            <td style="padding: 1.25rem 1.5rem;">
+              {% if src.is_verified %}
+                <span class="badge badge-success">✓ Verified</span>
+              {% else %}
+                <span class="badge badge-warning">Under Review</span>
+              {% endif %}
+            </td>
+            <td style="padding: 1.25rem 1.5rem; font-weight: 600;">
+              {{ src.jobs.count }}
+            </td>
+            <td style="padding: 1.25rem 1.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+              {{ src.last_checked_at|date:"d M Y, H:i"|default:"Recently" }}
+            </td>
+            <td style="padding: 1.25rem 1.5rem; text-align: right;">
+              <a href="{% url 'sources:source_detail' src.pk %}" class="btn btn-outline btn-sm">
+                Details &rarr;
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

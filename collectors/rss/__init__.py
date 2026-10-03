@@ -1,0 +1,1 @@
+# RSS/Atom collectors package

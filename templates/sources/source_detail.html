@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ source.name }} — Source Provenance — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem;">
+
+  <!-- Breadcrumb -->
+  <div style="margin-bottom: 1.5rem; font-size: 0.875rem; color: var(--text-muted);">
+    <a href="{% url 'jobs:job_list' %}">Opportunities</a> &rsaquo;
+    <a href="{% url 'sources:source_list' %}">Sources</a> &rsaquo;
+    <span style="color: var(--text-secondary);">{{ source.name }}</span>
+  </div>
+
+  <!-- Header Card -->
+  <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--secondary);">{{ source.name }}</h1>
+        {% if source.is_verified %}
+          <span class="badge badge-success">✓ Verified Provenance</span>
+        {% endif %}
+      </div>
+      <p style="color: var(--text-secondary); font-size: 0.95rem;">
+        Classification: <strong>{{ source.get_source_type_display }}</strong> • Status: <strong style="text-transform: capitalize;">{{ source.status }}</strong>
+      </p>
+    </div>
+
+    <div>
+      <a href="{{ source.source_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+        Visit Source Website ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Source Telemetry Metrics -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+      <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Total Ingested</span>
+      <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">{{ source.jobs.count }}</div>
+    </div>
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+      <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Last Verification</span>
+      <div style="font-size: 1rem; font-weight: 700; color: var(--secondary); margin-top: 0.4rem;">{{ source.last_checked_at|date:"d M Y, H:i"|default:"Recently" }}</div>
+    </div>
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+      <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Error Incidents</span>
+      <div style="font-size: 1.6rem; font-weight: 800; color: {% if source.error_count == 0 %}var(--accent){% else %}var(--danger){% endif %}; margin-top: 0.25rem;">{{ source.error_count }}</div>
+    </div>
+  </div>
+
+  <!-- Opportunities Ingested From This Source -->
+  <div style="margin-bottom: 1.5rem;">
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">
+      Opportunities Originating From This Source
+    </h2>
+    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+      Every listing below is directly sourced and synchronized with {{ source.name }}.
+    </p>
+  </div>
+
+  {% if jobs %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+      {% for job in jobs %}
+        {% include 'includes/job_card.html' with job=job %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="background: white; border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); padding: 3rem 2rem; text-align: center;">
+      <p style="color: var(--text-muted);">No active opportunities currently linked to this source.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
