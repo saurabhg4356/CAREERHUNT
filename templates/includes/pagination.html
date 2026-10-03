@@ -1,0 +1,19 @@
+{% if is_paginated %}
+<div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 2.5rem;">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if current_q %}&q={{ current_q }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_exp %}&exp={{ current_exp }}{% endif %}{% if current_mode %}&mode={{ current_mode }}{% endif %}{% if current_location %}&location={{ current_location }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" class="btn btn-outline btn-sm">
+      &laquo; Previous
+    </a>
+  {% endif %}
+
+  <span style="font-size: 0.9rem; color: var(--text-secondary); padding: 0.35rem 0.75rem;">
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+  </span>
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if current_q %}&q={{ current_q }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_exp %}&exp={{ current_exp }}{% endif %}{% if current_mode %}&mode={{ current_mode }}{% endif %}{% if current_location %}&location={{ current_location }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" class="btn btn-outline btn-sm">
+      Next &raquo;
+    </a>
+  {% endif %}
+</div>
+{% endif %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.name }} Careers &amp; Opportunities — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem;">
+
+  <!-- Breadcrumb -->
+  <div style="margin-bottom: 1.5rem; font-size: 0.875rem; color: var(--text-muted);">
+    <a href="{% url 'jobs:job_list' %}">Opportunities</a> &rsaquo;
+    <a href="{% url 'companies:company_list' %}">Companies</a> &rsaquo;
+    <span style="color: var(--text-secondary);">{{ company.name }}</span>
+  </div>
+
+  <!-- Company Header Card -->
+  <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+      <div style="width: 72px; height: 72px; border-radius: var(--radius-md); background: var(--bg-main); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2rem; color: var(--primary);">
+        {{ company.name|first }}
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--secondary);">{{ company.name }}</h1>
+          {% if company.is_verified %}
+            <span class="badge badge-success">✓ Verified Employer</span>
+          {% endif %}
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.25rem;">
+          🏢 {{ company.industry }} • 📍 {{ company.headquarters }}
+        </p>
+      </div>
+    </div>
+
+    {% if company.website %}
+      <a href="{{ company.website }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+        Official Website ↗
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Opportunities by this company -->
+  <div style="margin-bottom: 1.5rem;">
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">
+      Open Roles at {{ company.name }}
+    </h2>
+    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+      Showing {{ jobs.count }} opportunity available from verified sources.
+    </p>
+  </div>
+
+  {% if jobs %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+      {% for job in jobs %}
+        {% include 'includes/job_card.html' with job=job %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="background: white; border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); padding: 3rem 2rem; text-align: center;">
+      <p style="color: var(--text-muted);">No open listings currently recorded for {{ company.name }}.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

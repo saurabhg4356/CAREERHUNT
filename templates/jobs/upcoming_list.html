@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Upcoming Opportunities — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 1.5rem;">
+  
+  <div style="text-align: center; max-width: 720px; margin: 0 auto 3rem;">
+    <span class="badge badge-warning" style="margin-bottom: 0.75rem; font-size: 0.85rem;">Early Access Pipeline</span>
+    <h1 style="font-size: 2.35rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.75rem;">
+      Upcoming Opportunities
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 1.05rem;">
+      Application portals for these roles have not opened yet. Review eligibility criteria in advance and prepare your portfolio.
+    </p>
+  </div>
+
+  {% if upcoming_jobs %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.75rem;">
+      {% for job in upcoming_jobs %}
+        <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
+          
+          <!-- Banner for countdown -->
+          <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--warning), #f59e0b);"></div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+              <div>
+                <a href="{% url 'companies:company_detail' job.company.slug %}" style="font-weight: 700; color: var(--secondary); font-size: 1rem;">
+                  {{ job.company.name }}
+                </a>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">📍 {{ job.location_name }} • {{ job.get_remote_type_display }}</div>
+              </div>
+              <span class="badge badge-warning">
+                Opens in {{ job.days_until_opening }} day{{ job.days_until_opening|pluralize }}
+              </span>
+            </div>
+
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem;">
+              <a href="{% url 'jobs:job_detail' job.slug %}" style="color: inherit; text-decoration: none;">
+                {{ job.title }}
+              </a>
+            </h3>
+
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.5;">
+              {{ job.description|truncatewords:25 }}
+            </p>
+
+            <!-- Key Dates -->
+            <div style="background: var(--bg-main); border-radius: var(--radius-md); padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.35rem;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">Application Opens:</span>
+                <strong>{{ job.application_open_date|date:"d M Y" }}</strong>
+              </div>
+              {% if job.application_deadline %}
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Application Closes:</span>
+                  <strong>{{ job.application_deadline|date:"d M Y" }}</strong>
+                </div>
+              {% endif %}
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">Source:</span>
+                <span>{{ job.source.name|truncatechars:22 }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline btn-sm" style="flex: 1;">
+              Preview Requirements
+            </a>
+            <a href="{{ job.source_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="flex: 1;">
+              Official Notice ↗
+            </a>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include 'includes/pagination.html' %}
+  {% else %}
+    <div style="background: white; border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center;">
+      <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">No upcoming openings scheduled</h3>
+      <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 1.5rem; font-size: 0.95rem;">
+        Check back soon or explore our actively open opportunities and internships.
+      </p>
+      <a href="{% url 'jobs:job_list' %}" class="btn btn-primary btn-sm">Explore Active Jobs</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

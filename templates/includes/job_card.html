@@ -1,0 +1,78 @@
+<div class="job-card" style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; transition: all var(--transition-smooth); box-shadow: var(--shadow-sm);">
+  <div>
+    <!-- Top Metadata: Company, Type Badge, Verification Badge -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; gap: 0.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--bg-main); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: var(--primary);">
+          {{ job.company.name|first }}
+        </div>
+        <div>
+          <a href="{% url 'companies:company_detail' job.company.slug %}" style="font-weight: 700; color: var(--secondary); font-size: 0.95rem; display: block;">
+            {{ job.company.name }}
+          </a>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">
+            📍 {{ job.location_name }} • {{ job.get_remote_type_display }}
+          </span>
+        </div>
+      </div>
+      
+      <span class="badge {% if job.opportunity_type == 'internship' %}badge-primary{% elif job.opportunity_type == 'graduate-program' %}badge-warning{% else %}badge-neutral{% endif %}">
+        {{ job.get_opportunity_type_display }}
+      </span>
+    </div>
+
+    <!-- Title -->
+    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.65rem; line-height: 1.35;">
+      <a href="{% url 'jobs:job_detail' job.slug %}" style="color: inherit; text-decoration: none;">
+        {{ job.title }}
+      </a>
+    </h3>
+
+    <!-- Experience & Salary Pill -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; font-size: 0.8rem;">
+      <span class="badge badge-neutral">Exp: {{ job.get_experience_level_display }}</span>
+      {% if job.is_salary_disclosed and job.salary_min %}
+        <span class="badge badge-success">
+          ₹{{ job.salary_min|floatformat:0 }} - ₹{{ job.salary_max|floatformat:0 }}
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- Skills required -->
+    {% if job.skills.all %}
+      <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        {% for skill in job.skills.all|slice:":4" %}
+          <span style="background: var(--bg-main); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.2rem 0.5rem; font-size: 0.75rem; color: var(--text-secondary); font-weight: 500;">
+            {{ skill.name }}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Provenance / Verification Attribution -->
+    <div style="background: var(--bg-main); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; margin-bottom: 1.25rem; font-size: 0.75rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid #f1f5f9;">
+      <div style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-secondary);">
+        <span style="color: var(--accent);">✓</span>
+        <span>Source: <strong>{{ job.source.name|truncatechars:26 }}</strong></span>
+      </div>
+      <span class="badge {% if job.is_closing_soon %}badge-danger{% else %}badge-neutral{% endif %}" style="font-size: 0.7rem;">
+        ⏳ {{ job.deadline_display }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Bottom CTA Actions -->
+  <div style="display: flex; gap: 0.65rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+    <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline btn-sm" style="flex: 1;">
+      View Details
+    </a>
+    <a href="{{ job.application_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="flex: 1;" title="Apply directly on employer source">
+      <span>Apply Source</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </svg>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Discover Opportunities — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem;">
+
+  <!-- Header -->
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;">
+      {{ page_heading|default:"Explore Verified Opportunities" }}
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 1.05rem;">
+      {{ page_subheading|default:"Filtered from authentic employer portals, official feeds, and legitimate career pipelines." }}
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: start;">
+    
+    <!-- Left Column: Faceted Filter Sidebar -->
+    <aside style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); position: sticky; top: 90px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--secondary);">Filter Openings</h3>
+        <a href="{% url 'jobs:job_list' %}" style="font-size: 0.8rem; color: var(--primary); font-weight: 600;">Reset All</a>
+      </div>
+
+      <form method="GET" action="" id="faceted-filter-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <!-- Search Keyword -->
+        <div>
+          <label style="display: block; font-size: 0.825rem; font-weight: 700; margin-bottom: 0.35rem;">Keywords</label>
+          <input type="text" name="q" value="{{ current_q }}" class="form-control" placeholder="Role, company, skill...">
+        </div>
+
+        <!-- Location -->
+        <div>
+          <label style="display: block; font-size: 0.825rem; font-weight: 700; margin-bottom: 0.35rem;">Location</label>
+          <input type="text" name="location" value="{{ current_location }}" class="form-control" placeholder="e.g. Bangalore, Pune">
+        </div>
+
+        <!-- Opportunity Type -->
+        <div>
+          <label style="display: block; font-size: 0.825rem; font-weight: 700; margin-bottom: 0.35rem;">Opportunity Type</label>
+          <select name="type" class="form-control" style="font-size: 0.875rem;">
+            <option value="">All Opportunity Types</option>
+            <option value="internship" {% if current_type == 'internship' %}selected{% endif %}>Internship</option>
+            <option value="full-time" {% if current_type == 'full-time' %}selected{% endif %}>Full-time</option>
+            <option value="graduate-program" {% if current_type == 'graduate-program' %}selected{% endif %}>Graduate Program</option>
+            <option value="trainee" {% if current_type == 'trainee' %}selected{% endif %}>Trainee</option>
+            <option value="apprenticeship" {% if current_type == 'apprenticeship' %}selected{% endif %}>Apprenticeship</option>
+          </select>
+        </div>
+
+        <!-- Experience Level -->
+        <div>
+          <label style="display: block; font-size: 0.825rem; font-weight: 700; margin-bottom: 0.35rem;">Experience Level</label>
+          <select name="exp" class="form-control" style="font-size: 0.875rem;">
+            <option value="">All Experience Levels</option>
+            <option value="fresher" {% if current_exp == 'fresher' %}selected{% endif %}>Fresher / Student</option>
+            <option value="0-1" {% if current_exp == '0-1' %}selected{% endif %}>0-1 years</option>
+            <option value="1-2" {% if current_exp == '1-2' %}selected{% endif %}>1-2 years</option>
+            <option value="2+" {% if current_exp == '2+' %}selected{% endif %}>2+ years</option>
+          </select>
+        </div>
+
+        <!-- Work Mode -->
+        <div>
+          <label style="display: block; font-size: 0.825rem; font-weight: 700; margin-bottom: 0.35rem;">Work Mode</label>
+          <select name="mode" class="form-control" style="font-size: 0.875rem;">
+            <option value="">All Modes</option>
+            <option value="remote" {% if current_mode == 'remote' %}selected{% endif %}>Remote Only</option>
+            <option value="hybrid" {% if current_mode == 'hybrid' %}selected{% endif %}>Hybrid</option>
+            <option value="on-site" {% if current_mode == 'on-site' %}selected{% endif %}>On-site</option>
+          </select>
+        </div>
+
+        <!-- Category -->
+        <div>
+          <label style="display: block; font-size: 0.825rem; font-weight: 700; margin-bottom: 0.35rem;">Career Category</label>
+          <select name="category" class="form-control" style="font-size: 0.875rem;">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+              <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Deadline Filter -->
+        <div>
+          <label style="display: block; font-size: 0.825rem; font-weight: 700; margin-bottom: 0.35rem;">Deadline Window</label>
+          <select name="deadline" class="form-control" style="font-size: 0.875rem;">
+            <option value="">Any Deadline</option>
+            <option value="today" {% if current_deadline == 'today' %}selected{% endif %}>Closing Today</option>
+            <option value="this_week" {% if current_deadline == 'this_week' %}selected{% endif %}>Closing This Week</option>
+            <option value="this_month" {% if current_deadline == 'this_month' %}selected{% endif %}>Closing This Month</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 0.5rem;">
+          Apply Filters
+        </button>
+      </form>
+    </aside>
+
+    <!-- Right Column: Results Grid -->
+    <div>
+      
+      <!-- Top Bar: Result count & Sort Dropdown -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem 1.25rem;">
+        <span style="font-size: 0.95rem; font-weight: 600; color: var(--secondary);">
+          Showing <strong>{{ total_results }}</strong> verified opportunit{{ total_results|pluralize:"y,ies" }}
+        </span>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Sort by:</span>
+          <select onchange="location = this.value;" class="form-control" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.85rem;">
+            <option value="?sort=newest{% if current_q %}&q={{ current_q }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_exp %}&exp={{ current_exp }}{% endif %}{% if current_mode %}&mode={{ current_mode }}{% endif %}{% if current_location %}&location={{ current_location }}{% endif %}" {% if current_sort == 'newest' %}selected{% endif %}>Recently Posted</option>
+            <option value="?sort=deadline_asc{% if current_q %}&q={{ current_q }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_exp %}&exp={{ current_exp }}{% endif %}{% if current_mode %}&mode={{ current_mode }}{% endif %}{% if current_location %}&location={{ current_location }}{% endif %}" {% if current_sort == 'deadline_asc' %}selected{% endif %}>Deadline (Urgent First)</option>
+            <option value="?sort=title{% if current_q %}&q={{ current_q }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_exp %}&exp={{ current_exp }}{% endif %}{% if current_mode %}&mode={{ current_mode }}{% endif %}{% if current_location %}&location={{ current_location }}{% endif %}" {% if current_sort == 'title' %}selected{% endif %}>Role Title (A-Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Opportunities Grid -->
+      {% if jobs %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+          {% for job in jobs %}
+            {% include 'includes/job_card.html' with job=job %}
+          {% endfor %}
+        </div>
+
+        {% include 'includes/pagination.html' %}
+      {% else %}
+        <!-- Empty State -->
+        <div style="background: white; border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+          <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">No matching opportunities found</h3>
+          <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 1.5rem; font-size: 0.95rem;">
+            Try broadening your search keywords or resetting your location and experience filters.
+          </p>
+          <a href="{% url 'jobs:job_list' %}" class="btn btn-outline btn-sm">Clear All Filters</a>
+        </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

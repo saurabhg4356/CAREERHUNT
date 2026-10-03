@@ -15,14 +15,21 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Dynamic context populated in subsequent stages as models come online
-        context["featured_jobs"] = []
-        context["upcoming_jobs"] = []
-        context["closing_soon_jobs"] = []
-        context["popular_skills"] = [
-            "Python", "Django", "Java", "React", "JavaScript",
-            "SQL", "AWS", "Docker", "Machine Learning"
-        ]
+        from apps.jobs.models import Job, Skill
+        from apps.companies.models import Company
+
+        context["featured_jobs"] = Job.objects.select_related("company", "source", "category").prefetch_related("job_skills__skill").active()[:6]
+        context["upcoming_jobs"] = Job.objects.select_related("company", "source").upcoming()[:3]
+        context["closing_soon_jobs"] = Job.objects.select_related("company", "source").closing_soon()[:3]
+        
+        context["stats"] = {
+            "active_jobs": Job.objects.active().count(),
+            "internships": Job.objects.internships().active().count(),
+            "upcoming": Job.objects.upcoming().count(),
+            "companies": Company.objects.count(),
+        }
+
+        context["popular_skills"] = Skill.objects.all()[:12]
         context["popular_locations"] = [
             "Bangalore", "Mumbai", "Pune", "Hyderabad", "Delhi NCR", "Remote"
         ]

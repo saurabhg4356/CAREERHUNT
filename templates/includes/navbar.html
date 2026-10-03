@@ -10,10 +10,10 @@
     </a>
 
     <ul class="nav-links">
-      <li><a href="{% url 'core:home' %}" class="nav-link active">Explore</a></li>
-      <li><a href="#internships" class="nav-link">Internships</a></li>
-      <li><a href="#upcoming" class="nav-link">Upcoming</a></li>
-      <li><a href="#companies" class="nav-link">Companies</a></li>
+      <li><a href="{% url 'jobs:job_list' %}" class="nav-link">Explore</a></li>
+      <li><a href="{% url 'jobs:internship_list' %}" class="nav-link">Internships</a></li>
+      <li><a href="{% url 'jobs:upcoming_list' %}" class="nav-link">Upcoming</a></li>
+      <li><a href="{% url 'companies:company_list' %}" class="nav-link">Companies</a></li>
     </ul>
 
     <div class="nav-actions">
