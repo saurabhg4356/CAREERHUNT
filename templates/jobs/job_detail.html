@@ -129,6 +129,25 @@
           </svg>
         </a>
 
+        <!-- Bookmark / Save button -->
+        <form method="POST" action="{% url 'jobs:toggle_save' job.slug %}" style="margin-bottom: 0.75rem;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline btn-sm" style="width: 100%;">
+            {% if is_saved %}★ Saved in Bookmarks (Click to Remove){% else %}☆ Save Opportunity{% endif %}
+          </button>
+        </form>
+
+        {% if user.is_authenticated %}
+          <!-- Application Tracker Quick Track -->
+          <form method="POST" action="{% url 'applications:track_job' job.pk %}" style="margin-bottom: 0.75rem;">
+            {% csrf_token %}
+            <input type="hidden" name="status" value="applied">
+            <button type="submit" class="btn btn-outline btn-sm" style="width: 100%; color: var(--secondary);">
+              📊 Track in Applications
+            </button>
+          </form>
+        {% endif %}
+
         {% if job.application_deadline %}
           <div style="font-size: 0.8rem; color: var(--text-muted);">
             Deadline: {{ job.application_deadline|date:"d M Y, h:i A" }}

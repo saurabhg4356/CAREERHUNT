@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Skill Gap Analysis: {{ job.title }} — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 860px; padding: 3rem 1.5rem;">
+
+  <!-- Breadcrumb -->
+  <div style="margin-bottom: 1.5rem; font-size: 0.875rem; color: var(--text-muted);">
+    <a href="{% url 'recommendations:list' %}">Recommendations</a> &rsaquo;
+    <span style="color: var(--text-secondary);">Skill Gap Analysis</span>
+  </div>
+
+  <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem;">
+      <div>
+        <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Skill Gap Breakdown</span>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.25rem;">
+          {{ job.title }}
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          {{ job.company.name }} • 📍 {{ job.location_name }}
+        </p>
+      </div>
+
+      <div style="text-align: right;">
+        <div style="font-size: 2rem; font-weight: 800; color: var(--primary);">
+          {{ score.match_percentage }}%
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+          CareerHunt Match Score
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Pillar Breakdown Cards -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; text-align: center;">
+      <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--radius-md);">
+        <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">{{ score.skill_match }}%</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">Skills</div>
+      </div>
+      <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--radius-md);">
+        <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent);">{{ score.location_match }}%</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">Location</div>
+      </div>
+      <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--radius-md);">
+        <div style="font-size: 1.25rem; font-weight: 800; color: var(--warning);">{{ score.experience_match }}%</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">Experience</div>
+      </div>
+      <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--radius-md);">
+        <div style="font-size: 1.25rem; font-weight: 800; color: #7c3aed;">{{ score.type_match }}%</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">Role Type</div>
+      </div>
+    </div>
+
+    <!-- Side-by-side Skills Comparison -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+      
+      <!-- Matched Skills -->
+      <div style="background: var(--accent-light); border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 1.5rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #065f46; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>✓</span>
+          <span>Matched Skills ({{ score.matched_skills|length }})</span>
+        </h3>
+        {% if score.matched_skills %}
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem; color: #065f46;">
+            {% for s in score.matched_skills %}
+              <li style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>✓</span> <strong>{{ s }}</strong>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p style="font-size: 0.85rem; color: #065f46;">None of your profile skills currently overlap with this role.</p>
+        {% endif %}
+      </div>
+
+      <!-- Missing Skills -->
+      <div style="background: var(--danger-light); border: 1px solid #fecaca; border-radius: var(--radius-md); padding: 1.5rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #991b1b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>✗</span>
+          <span>Missing Skills to Learn ({{ score.missing_skills|length }})</span>
+        </h3>
+        {% if score.missing_skills %}
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem; color: #991b1b;">
+            {% for s in score.missing_skills %}
+              <li style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>✗</span> <strong>{{ s }}</strong>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p style="font-size: 0.85rem; color: #065f46; font-weight: 600;">Outstanding! You possess all required technical skills for this role.</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+      <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline btn-sm">
+        &larr; Back to Job Details
+      </a>
+      <a href="{{ job.application_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+        Apply on Official Portal ↗
+      </a>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

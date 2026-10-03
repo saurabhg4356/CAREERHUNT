@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Tracker — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 1.5rem;">
+
+  <!-- Header -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Pipeline Tracker</span>
+      <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--secondary);">
+        Job &amp; Internship Applications
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 1rem;">
+        Track your submission milestones, assessment dates, interview stages, and offers.
+      </p>
+    </div>
+
+    <a href="{% url 'jobs:job_list' %}" class="btn btn-primary btn-sm">
+      + Discover Opportunities
+    </a>
+  </div>
+
+  <!-- Pipeline Milestone Summary Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 2.5rem;">
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+      <span style="font-size: 0.775rem; color: var(--text-muted); text-transform: uppercase;">Total Tracked</span>
+      <div style="font-size: 1.75rem; font-weight: 800; color: var(--secondary); margin-top: 0.25rem;">{{ status_counts.total }}</div>
+    </div>
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+      <span style="font-size: 0.775rem; color: var(--text-muted); text-transform: uppercase;">Applied</span>
+      <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">{{ status_counts.applied }}</div>
+    </div>
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+      <span style="font-size: 0.775rem; color: var(--text-muted); text-transform: uppercase;">Assessments</span>
+      <div style="font-size: 1.75rem; font-weight: 800; color: #7c3aed; margin-top: 0.25rem;">{{ status_counts.assessment }}</div>
+    </div>
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+      <span style="font-size: 0.775rem; color: var(--text-muted); text-transform: uppercase;">Interviewing</span>
+      <div style="font-size: 1.75rem; font-weight: 800; color: var(--warning); margin-top: 0.25rem;">{{ status_counts.interview }}</div>
+    </div>
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+      <span style="font-size: 0.775rem; color: var(--text-muted); text-transform: uppercase;">Offers Received</span>
+      <div style="font-size: 1.75rem; font-weight: 800; color: var(--accent); margin-top: 0.25rem;">{{ status_counts.offer }}</div>
+    </div>
+  </div>
+
+  <!-- Upcoming Interviews Alert -->
+  {% if upcoming_interviews %}
+    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: #92400e; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🎯</span> Upcoming Scheduled Interviews
+      </h3>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% for app in upcoming_interviews %}
+          <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 0.75rem 1rem; border-radius: var(--radius-md); border: 1px solid #fef3c7;">
+            <div>
+              <strong>{{ app.job.title }}</strong> at {{ app.job.company.name }}
+            </div>
+            <div style="font-size: 0.85rem; font-weight: 600; color: #b45309;">
+              📅 {{ app.interview_date|date:"D, d M Y @ h:i A" }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Applications Table -->
+  {% if applications %}
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+        <thead>
+          <tr style="background: var(--bg-main); border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            <th style="padding: 1rem 1.25rem;">Position &amp; Company</th>
+            <th style="padding: 1rem 1.25rem;">Current Status</th>
+            <th style="padding: 1rem 1.25rem;">Applied Date</th>
+            <th style="padding: 1rem 1.25rem;">Interview Schedule</th>
+            <th style="padding: 1rem 1.25rem;">Notes</th>
+            <th style="padding: 1rem 1.25rem; text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+            <tr style="border-bottom: 1px solid var(--border-subtle);">
+              
+              <!-- Job & Company -->
+              <td style="padding: 1.25rem;">
+                <a href="{% url 'jobs:job_detail' app.job.slug %}" style="font-weight: 700; color: var(--secondary); display: block;">
+                  {{ app.job.title }}
+                </a>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">
+                  {{ app.job.company.name }} • 📍 {{ app.job.location_name }}
+                </span>
+              </td>
+
+              <!-- Status Form -->
+              <td style="padding: 1.25rem;">
+                <form method="POST" action="{% url 'applications:update_application' app.pk %}" style="display: flex; gap: 0.35rem; align-items: center;">
+                  {% csrf_token %}
+                  <select name="status" class="form-control" style="font-size: 0.825rem; padding: 0.35rem 0.5rem; width: auto;" onchange="this.form.submit();">
+                    {% for key, val in status_choices %}
+                      <option value="{{ key }}" {% if app.status == key %}selected{% endif %}>{{ val }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+              </td>
+
+              <!-- Applied Date -->
+              <td style="padding: 1.25rem; font-size: 0.85rem; color: var(--text-secondary);">
+                {{ app.applied_date|date:"d M Y"|default:"Not specified" }}
+              </td>
+
+              <!-- Interview Schedule -->
+              <td style="padding: 1.25rem; font-size: 0.85rem;">
+                {% if app.interview_date %}
+                  <span class="badge badge-warning">📅 {{ app.interview_date|date:"d M, H:i" }}</span>
+                {% else %}
+                  <span style="color: var(--text-muted);">None set</span>
+                {% endif %}
+              </td>
+
+              <!-- Notes -->
+              <td style="padding: 1.25rem; font-size: 0.85rem; color: var(--text-secondary); max-width: 200px;">
+                {{ app.notes|truncatewords:10|default:"—" }}
+              </td>
+
+              <!-- Actions -->
+              <td style="padding: 1.25rem; text-align: right;">
+                <div style="display: inline-flex; gap: 0.5rem;">
+                  <a href="{{ app.job.application_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" title="Open Destination">
+                    ↗
+                  </a>
+                  <form method="POST" action="{% url 'applications:delete_application' app.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fca5a5;" onclick="return confirm('Remove this application from tracking?');">
+                      &times;
+                    </button>
+                  </form>
+                </div>
+              </td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="background: white; border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+      <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">Your tracker is empty</h3>
+      <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 1.5rem; font-size: 0.95rem;">
+        When you apply to opportunities, track your progress here to organize interviews, assessments, and follow-ups.
+      </p>
+      <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">Find Opportunities to Apply</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -160,4 +160,59 @@ class JobDetailView(DetailView):
         context["related_jobs"] = Job.objects.select_related("company", "source").filter(
             category=self.object.category
         ).exclude(pk=self.object.pk)[:3]
+        if self.request.user.is_authenticated:
+            from .models import SavedJob
+            context["is_saved"] = SavedJob.objects.filter(user=self.request.user, job=self.object).exists()
         return context
+
+
+class ToggleSaveJobView(ListView):
+    """
+    Toggles bookmarking a job for authenticated candidate.
+    """
+    def post(self, request, slug):
+        if not request.user.is_authenticated:
+            from django.contrib import messages
+            messages.warning(request, "Please sign in to save opportunities.")
+            from django.shortcuts import redirect
+            return redirect("accounts:login")
+
+        from django.http import JsonResponse
+        from django.shortcuts import redirect
+        from django.contrib import messages
+        from .models import SavedJob
+
+        job = get_object_or_404(Job, slug=slug)
+        saved_obj = SavedJob.objects.filter(user=request.user, job=job).first()
+        if saved_obj:
+            saved_obj.delete()
+            saved = False
+            messages.info(request, f"Removed '{job.title}' from your saved opportunities.")
+        else:
+            SavedJob.objects.create(user=request.user, job=job)
+            saved = True
+            messages.success(request, f"Saved '{job.title}' to your profile!")
+
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"saved": saved, "job_id": job.id})
+        
+        referer = request.META.get("HTTP_REFERER")
+        return redirect(referer or "jobs:job_list")
+
+
+class SavedJobListView(ListView):
+    """
+    Lists opportunities bookmarked by the candidate.
+    """
+    model = Job
+    template_name = "jobs/saved_jobs.html"
+    context_object_name = "saved_jobs"
+    paginate_by = 12
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Job.objects.none()
+        from .models import SavedJob
+        return Job.objects.filter(
+            saved_by_users__user=self.request.user
+        ).select_related("company", "source").prefetch_related("job_skills__skill").order_by("-saved_by_users__created_at")

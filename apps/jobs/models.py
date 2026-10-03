@@ -290,3 +290,20 @@ class JobSkill(TimeStampedModel):
 
     def __str__(self):
         return f"{self.job.title} - {self.skill.name} ({'Required' if self.is_mandatory else 'Preferred'})"
+
+
+class SavedJob(TimeStampedModel):
+    """
+    Candidate bookmarked opportunity for later review.
+    """
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="saved_jobs")
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="saved_by_users")
+
+    class Meta:
+        verbose_name = "Saved Job"
+        verbose_name_plural = "Saved Jobs"
+        unique_together = ("user", "job")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.job.title}"

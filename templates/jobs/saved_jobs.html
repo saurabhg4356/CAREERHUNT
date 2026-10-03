@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Opportunities — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 1.5rem;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Your Bookmarks</span>
+      <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--secondary);">
+        Saved Opportunities
+      </h1>
+      <p style="color: var(--text-secondary); font-size: 1rem;">
+        Keep track of roles you intend to apply to before application deadlines expire.
+      </p>
+    </div>
+    
+    <a href="{% url 'jobs:job_list' %}" class="btn btn-outline btn-sm">
+      + Browse More Opportunities
+    </a>
+  </div>
+
+  {% if saved_jobs %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.75rem;">
+      {% for job in saved_jobs %}
+        {% include 'includes/job_card.html' with job=job %}
+      {% endfor %}
+    </div>
+
+    {% include 'includes/pagination.html' %}
+  {% else %}
+    <div style="background: white; border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); padding: 4rem 2rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">📌</div>
+      <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">No saved opportunities yet</h3>
+      <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 1.5rem; font-size: 0.95rem;">
+        When you discover roles that match your career goals, bookmark them to track their deadlines and apply conveniently.
+      </p>
+      <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">Discover Jobs &amp; Internships</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

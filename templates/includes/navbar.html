@@ -14,6 +14,11 @@
       <li><a href="{% url 'jobs:internship_list' %}" class="nav-link">Internships</a></li>
       <li><a href="{% url 'jobs:upcoming_list' %}" class="nav-link">Upcoming</a></li>
       <li><a href="{% url 'companies:company_list' %}" class="nav-link">Companies</a></li>
+      {% if user.is_authenticated %}
+        <li><a href="{% url 'recommendations:list' %}" class="nav-link">Matches</a></li>
+        <li><a href="{% url 'jobs:saved_jobs' %}" class="nav-link">Saved</a></li>
+        <li><a href="{% url 'applications:dashboard' %}" class="nav-link">Tracker</a></li>
+      {% endif %}
     </ul>
 
     <div class="nav-actions">
