@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Job Alerts — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; padding: 3rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem;">
+    <a href="{% url 'notifications:list' %}" style="font-size: 0.85rem; color: var(--text-muted);">&larr; Back to Notifications</a>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--secondary); margin-top: 0.5rem; margin-bottom: 0.5rem;">
+      Custom Opportunity Alerts
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 1rem;">
+      Set criteria to automatically receive notifications whenever newly ingested opportunities match your target roles.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+    
+    <!-- Create Alert Form -->
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm);">
+      <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--secondary); margin-bottom: 1.25rem;">
+        + Create New Job Alert
+      </h2>
+
+      <form method="POST" action="{% url 'notifications:alerts' %}" style="display: flex; flex-direction: column; gap: 1rem;">
+        {% csrf_token %}
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Alert Name</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. Fresher Python Backend Roles" required>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Keywords / Skills</label>
+          <input type="text" name="keywords" class="form-control" placeholder="e.g. Python, Django, AWS">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Preferred Location</label>
+          <input type="text" name="location" class="form-control" placeholder="e.g. Bangalore or Remote">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Opportunity Type</label>
+            <select name="opportunity_type" class="form-control">
+              <option value="">Any Type</option>
+              <option value="internship">Internship</option>
+              <option value="full-time">Full-time</option>
+              <option value="graduate-program">Graduate Program</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem;">Frequency</label>
+            <select name="frequency" class="form-control">
+              <option value="instant">Instant</option>
+              <option value="daily" selected>Daily Digest</option>
+              <option value="weekly">Weekly Digest</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+          Create Alert
+        </button>
+      </form>
+    </div>
+
+    <!-- Active Alerts List -->
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--secondary);">
+        Active Alert Criteria ({{ alerts.count }})
+      </h2>
+
+      {% if alerts %}
+        {% for alert in alerts %}
+          <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.25rem;">
+                {{ alert.name }}
+              </h3>
+              <div style="font-size: 0.825rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.2rem;">
+                {% if alert.keywords %}<span>Keywords: <strong>{{ alert.keywords }}</strong></span>{% endif %}
+                {% if alert.location %}<span>Location: <strong>{{ alert.location }}</strong></span>{% endif %}
+                <span>Frequency: <strong style="text-transform: capitalize;">{{ alert.frequency }}</strong></span>
+              </div>
+            </div>
+
+            <form method="POST" action="{% url 'notifications:delete_alert' alert.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fca5a5;">
+                Delete
+              </button>
+            </form>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="background: white; border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 2.5rem 1.5rem; text-align: center;">
+          <p style="color: var(--text-muted); font-size: 0.9rem;">No alerts configured yet. Create one on the left to stay updated.</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

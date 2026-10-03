@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Listing: {{ job.title }} — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 650px; padding: 3rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem;">
+    <a href="{% url 'jobs:job_detail' job.slug %}" style="font-size: 0.85rem; color: var(--text-muted);">&larr; Back to {{ job.title }}</a>
+    <h1 style="font-size: 2rem; font-weight: 800; color: var(--secondary); margin-top: 0.5rem; margin-bottom: 0.5rem;">
+      Report an Issue with this Listing
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+      CareerHunt relies on student and community feedback to maintain genuine authenticity across our opportunities.
+    </p>
+  </div>
+
+  <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm);">
+    
+    <div style="background: var(--bg-main); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem;">
+      <strong>Target Opportunity:</strong> {{ job.title }} at <strong>{{ job.company.name }}</strong>
+      <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
+        Source: {{ job.source.name }} • Destination: {{ job.application_url|truncatechars:45 }}
+      </div>
+    </div>
+
+    <form method="POST" action="{% url 'reports:submit_report' job.pk %}" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% csrf_token %}
+
+      <div>
+        <label style="display: block; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.35rem;">Reason for Report</label>
+        <select name="reason" class="form-control" required>
+          {% for code, label in reason_choices %}
+            <option value="{{ code }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 0.875rem; font-weight: 700; margin-bottom: 0.35rem;">Detailed Explanation</label>
+        <textarea name="details" class="form-control" rows="5" placeholder="Please provide specific details (e.g. Broken link, employer demanding registration fee, role closed on official site)..." required></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+        <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline btn-sm">
+          Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          Submit Report for Moderation
+        </button>
+      </div>
+    </form>
+
+  </div>
+
+</div>
+{% endblock %}
