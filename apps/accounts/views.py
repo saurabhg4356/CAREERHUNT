@@ -137,3 +137,66 @@ def remove_skill_view(request, pk):
     user_skill.delete()
     messages.info(request, f"Removed {skill_name} from your profile.")
     return redirect("accounts:profile")
+
+
+@login_required
+def resume_matcher_view(request):
+    """
+    Resume text & skill extraction view providing candidate match breakdown
+    and opportunity fit ranking.
+    """
+    from .resume_parser import analyze_resume_text
+
+    analysis_results = None
+    resume_text = ""
+
+    if request.method == "POST":
+        resume_text = request.POST.get("resume_text", "").strip()
+
+        # Handle uploaded file if provided
+        uploaded_file = request.FILES.get("resume_file")
+        if uploaded_file:
+            try:
+                # Read text or decode utf-8
+                content = uploaded_file.read()
+                try:
+                    resume_text = content.decode("utf-8")
+                except UnicodeDecodeError:
+                    resume_text = content.decode("latin-1", errors="ignore")
+            except Exception as e:
+                messages.error(request, f"Error reading uploaded file: {e}")
+
+        if resume_text:
+            analysis_results = analyze_resume_text(resume_text)
+            messages.success(request, f"Extracted {len(analysis_results['detected_skills'])} technical skills from your resume.")
+        else:
+            messages.error(request, "Please paste resume text or upload a document.")
+
+    return render(request, "accounts/resume_matcher.html", {
+        "analysis": analysis_results,
+        "resume_text": resume_text,
+    })
+
+
+@login_required
+def import_resume_skills_view(request):
+    """
+    Imports detected skills from resume analysis directly into candidate profile.
+    """
+    if request.method == "POST":
+        skills_str = request.POST.get("skills", "")
+        if skills_str:
+            skill_names = [s.strip() for s in skills_str.split(",") if s.strip()]
+            added_count = 0
+            for name in skill_names:
+                skill = Skill.objects.filter(name__iexact=name).first()
+                if skill:
+                    _, created = UserSkill.objects.get_or_create(
+                        profile=request.user.profile,
+                        skill=skill,
+                        defaults={"proficiency": "intermediate"}
+                    )
+                    if created:
+                        added_count += 1
+            messages.success(request, f"Successfully imported {added_count} skill(s) into your CareerHunt profile!")
+    return redirect("accounts:profile")

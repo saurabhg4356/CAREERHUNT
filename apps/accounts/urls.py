@@ -11,6 +11,8 @@ from .views import (
     delete_education_view,
     add_skill_view,
     remove_skill_view,
+    resume_matcher_view,
+    import_resume_skills_view,
 )
 
 app_name = "accounts"
@@ -24,4 +26,6 @@ urlpatterns = [
     path("profile/education/<int:pk>/delete/", delete_education_view, name="delete_education"),
     path("profile/skills/add/", add_skill_view, name="add_skill"),
     path("profile/skills/<int:pk>/remove/", remove_skill_view, name="remove_skill"),
+    path("resume-matcher/", resume_matcher_view, name="resume_matcher"),
+    path("resume-matcher/import-skills/", import_resume_skills_view, name="import_resume_skills"),
 ]

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Analysis &amp; Skill Extraction — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 960px; padding: 3rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem;">
+    <span class="badge badge-primary" style="margin-bottom: 0.5rem;">AI &amp; Skill Parsing</span>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;">
+      Resume Matcher &amp; Skill Extractor
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 1rem;">
+      Extract verified technical competencies from your resume and see which opportunities you align with best.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; margin-bottom: 2.5rem;">
+    
+    <!-- Upload / Paste Form -->
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm);">
+      <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--secondary); margin-bottom: 1rem;">
+        Input Resume Content
+      </h2>
+
+      <form method="POST" action="{% url 'accounts:resume_matcher' %}" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% csrf_token %}
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
+            Paste Resume Text
+          </label>
+          <textarea name="resume_text" class="form-control" rows="8" placeholder="Paste your resume summary, project descriptions, and technical skills here...">{{ resume_text }}</textarea>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
+            Or Upload Document (.txt, markdown, text)
+          </label>
+          <input type="file" name="resume_file" class="form-control" accept=".txt,.text,.md">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+          🔍 Analyze &amp; Extract Skills
+        </button>
+      </form>
+    </div>
+
+    <!-- Privacy & Security Guarantee -->
+    <div style="background: var(--bg-main); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🛡️</span> Data Privacy Guarantee
+      </h3>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+        CareerHunt performs in-memory natural language entity extraction against our canonical skill taxonomy. Your resume is never sold, shared with third-party advertisers, or permanently retained without your permission.
+      </p>
+
+      <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.5rem;">
+        What We Analyze:
+      </h4>
+      <ul style="font-size: 0.85rem; color: var(--text-secondary); list-style: disc; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem;">
+        <li>Programming languages and developer frameworks</li>
+        <li>Cloud infrastructure and database tools</li>
+        <li>Estimated years of experience and education level</li>
+        <li>Cross-comparison with open internships and jobs</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Analysis Results -->
+  {% if analysis %}
+    <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+        <div>
+          <span class="badge badge-success" style="margin-bottom: 0.35rem;">Extraction Successful</span>
+          <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--secondary);">
+            Identified Competencies
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 0.85rem;">
+            Estimated Profile Level: <strong style="text-transform: capitalize;">{{ analysis.estimated_experience }}</strong>
+          </p>
+        </div>
+
+        {% if analysis.detected_skills %}
+          <form method="POST" action="{% url 'accounts:import_resume_skills' %}">
+            {% csrf_token %}
+            <input type="hidden" name="skills" value="{{ analysis.detected_skills|join:',' }}">
+            <button type="submit" class="btn btn-outline btn-sm" style="color: var(--primary); border-color: var(--primary);">
+              + Import All ({{ analysis.detected_skills|length }}) Skills to Profile
+            </button>
+          </form>
+        {% endif %}
+      </div>
+
+      <!-- Detected Skills Badges -->
+      {% if analysis.detected_skills %}
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem;">
+          {% for sk in analysis.detected_skills %}
+            <span class="badge badge-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+              ✓ {{ sk }}
+            </span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">No technical skills from our taxonomy were detected in the provided text.</p>
+      {% endif %}
+
+      <!-- Top Matching Opportunities based on Resume -->
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--secondary); margin-bottom: 1rem;">
+        Top Opportunity Matches for This Resume
+      </h3>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        {% for match in analysis.matching_opportunities %}
+          <div style="border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.2rem;">
+                <a href="{% url 'jobs:job_detail' match.job.slug %}" style="color: inherit;">
+                  {{ match.job.title }}
+                </a>
+              </h4>
+              <span style="font-size: 0.825rem; color: var(--text-muted);">
+                {{ match.job.company.name }} • 📍 {{ match.job.location_name }}
+              </span>
+              
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.775rem;">
+                {% if match.matched_skills %}
+                  <span style="color: #065f46;">Matched: {{ match.matched_skills|join:", " }}</span>
+                {% endif %}
+                {% if match.missing_skills %}
+                  <span style="color: #991b1b;">• Skill Gap: {{ match.missing_skills|join:", " }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span class="badge badge-primary" style="font-size: 0.95rem; font-weight: 800; padding: 0.4rem 0.8rem;">
+                {{ match.match_score }}% Match
+              </span>
+              <a href="{% url 'jobs:job_detail' match.job.slug %}" class="btn btn-outline btn-sm">
+                View &rarr;
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
